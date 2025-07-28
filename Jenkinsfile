@@ -44,7 +44,7 @@ pipeline {
 
                         aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
-                        kubectl set image deployment/frontend-deployment myapp-container=$IMAGE_NAME --record
+                        kubectl set image deployment/frontend-deployment frontend=$IMAGE_NAME --record
                         kubectl rollout status deployment/frontend-deployment
                     '''
                 }
