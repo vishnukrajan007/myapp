@@ -16,7 +16,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME -f dockerfiles/Dockerfile.frontend .'
+                sh 'docker build --pull --no-cache -t ${FULL_IMAGE} -t ${LATEST_IMAGE} -f dockerfiles/Dockerfile.frontend .'
             }
         }
 
