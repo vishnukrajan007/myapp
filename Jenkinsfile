@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'vishnukrajan007/vishnukrajan007/frontend:latest'
+        IMAGE_NAME = 'vishnukrajan007/myapp:latest'
     }
 
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/vishnukrajan007/myapp.git'
+                git branch: 'main', url: 'https://github.com/vishnukrajan007/myapp.git'
             }
         }
 
