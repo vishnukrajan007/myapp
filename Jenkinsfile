@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'vishnukrajan007/myapp:latest'
+        AWS_REGION = 'ap-south-1'
+        EKS_CLUSTER_NAME = 'vkr-cluster'
     }
 
     stages {
@@ -29,14 +31,23 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to EKS') {
             steps {
-                sh '''
-                    docker pull $IMAGE_NAME
-                    docker stop myapp || true
-                    docker rm myapp || true
-                    docker run -d --name myapp -p 80:80 $IMAGE_NAME
-                '''
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                        aws configure set default.region $AWS_REGION
+
+                        aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+                        kubectl set image deployment/myapp-deployment myapp-container=$IMAGE_NAME --record
+                        kubectl rollout status deployment/myapp-deployment
+                    '''
+                }
             }
         }
     }
